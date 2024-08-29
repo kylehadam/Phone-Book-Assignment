@@ -1,3 +1,4 @@
+// Define the PhoneBook class
 class PhoneBook {
     constructor() {
         this.entries = [];
@@ -72,8 +73,37 @@ class PhoneBook {
 }
 
 // Attach the PhoneBook class to the window object for browser use
-if (typeof window !== 'undefined') {
-    window.PhoneBook = PhoneBook;
-}
+window.PhoneBook = PhoneBook;
 
-module.exports = PhoneBook;
+// Code to handle form submission and display entries
+document.addEventListener('DOMContentLoaded', function () {
+    const phoneBook = new PhoneBook();
+
+    document.getElementById('phoneBookForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        const email = document.getElementById('email').value;
+
+        phoneBook.addEntry(firstName, lastName, phoneNumber, { email });
+        displayEntries(phoneBook.getEntriesGroupedByInitial());
+    });
+
+    function displayEntries(groupedEntries) {
+        const entriesList = document.getElementById('entries');
+        entriesList.innerHTML = ''; // Clear existing entries
+
+        Object.keys(groupedEntries).forEach(initial => {
+            const initialHeader = document.createElement('h3');
+            initialHeader.textContent = initial;
+            entriesList.appendChild(initialHeader);
+
+            groupedEntries[initial].forEach(entry => {
+                const li = document.createElement('li');
+                li.textContent = `${entry.firstName} ${entry.lastName}: ${entry.phoneNumber} (${entry.email || 'No email'})`;
+                entriesList.appendChild(li);
+            });
+        });
+    }
+});
