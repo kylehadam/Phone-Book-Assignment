@@ -1,4 +1,4 @@
-// Define the PhoneBook class
+// Ensure the PhoneBook class is available in the global scope (browser environment)
 class PhoneBook {
     constructor() {
         this.entries = [];
@@ -30,24 +30,12 @@ class PhoneBook {
         }
     }
 
-    bubbleSortByLastName() {
-        let n = this.entries.length;
-        let swapped;
-        do {
-            swapped = false;
-            for (let i = 0; i < n - 1; i++) {
-                if (this.entries[i].lastName.localeCompare(this.entries[i + 1].lastName) > 0) {
-                    [this.entries[i], this.entries[i + 1]] = [this.entries[i + 1], this.entries[i]];
-                    swapped = true;
-                }
-            }
-            n--;
-        } while (swapped);
-        console.log("Entries sorted by last name using bubble sort");
+    sortEntriesByLastName() {
+        this.entries.sort((a, b) => a.lastName.localeCompare(b.lastName));
+        console.log("Entries sorted by last name using Timsort");
     }
 
     searchEntries(query, criteria = 'firstName') {
-        // Check if criteria is valid and the entry has this property
         const results = this.entries.filter(entry => {
             if (entry[criteria] && typeof entry[criteria] === 'string') {
                 return entry[criteria].includes(query);
@@ -59,7 +47,7 @@ class PhoneBook {
     }
 
     getEntriesGroupedByInitial() {
-        this.bubbleSortByLastName();
+        this.sortEntriesByLastName();  // Using Timsort for sorting by last name
         const grouped = {};
         this.entries.forEach(entry => {
             const initial = entry.lastName[0].toUpperCase();
@@ -73,12 +61,14 @@ class PhoneBook {
 }
 
 // Attach the PhoneBook class to the window object for browser use
-window.PhoneBook = PhoneBook;
+if (typeof window !== 'undefined') {
+    window.PhoneBook = PhoneBook;
+}
 
-// Code to handle form submission and display entries
 document.addEventListener('DOMContentLoaded', function () {
     const phoneBook = new PhoneBook();
 
+    // Event listener for the form submission to add a new entry
     document.getElementById('phoneBookForm').addEventListener('submit', function(event) {
         event.preventDefault();
         const firstName = document.getElementById('firstName').value;
@@ -86,14 +76,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const phoneNumber = document.getElementById('phoneNumber').value;
         const email = document.getElementById('email').value;
 
+        // Add the new entry to the phone book
         phoneBook.addEntry(firstName, lastName, phoneNumber, { email });
+        // Display updated entries
         displayEntries(phoneBook.getEntriesGroupedByInitial());
     });
 
+    // Function to display phone book entries grouped by last name initial
     function displayEntries(groupedEntries) {
         const entriesList = document.getElementById('entries');
         entriesList.innerHTML = ''; // Clear existing entries
 
+        // Loop through each group and display entries
         Object.keys(groupedEntries).forEach(initial => {
             const initialHeader = document.createElement('h3');
             initialHeader.textContent = initial;

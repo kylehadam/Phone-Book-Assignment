@@ -29,24 +29,35 @@ class PhoneBook {
         }
     }
 
-    bubbleSortByLastName() {
-        let n = this.entries.length;
-        let swapped;
-        do {
-            swapped = false;
-            for (let i = 0; i < n - 1; i++) {
-                if (this.entries[i].lastName.localeCompare(this.entries[i + 1].lastName) > 0) {
-                    [this.entries[i], this.entries[i + 1]] = [this.entries[i + 1], this.entries[i]];
-                    swapped = true;
-                }
+    // Quick Sort implementation for sorting by last name
+    quickSortEntries(low = 0, high = this.entries.length - 1) {
+        if (low < high) {
+            const pi = this.partition(low, high);
+            this.quickSortEntries(low, pi - 1);
+            this.quickSortEntries(pi + 1, high);
+        }
+    }
+
+    partition(low, high) {
+        const pivot = this.entries[high].lastName;
+        let i = low - 1;
+        for (let j = low; j < high; j++) {
+            if (this.entries[j].lastName.localeCompare(this.entries[high].lastName) < 0) {
+                i++;
+                [this.entries[i], this.entries[j]] = [this.entries[j], this.entries[i]];
             }
-            n--;
-        } while (swapped);
-        console.log("Entries sorted by last name using bubble sort");
+        }
+        [this.entries[i + 1], this.entries[high]] = [this.entries[high], this.entries[i + 1]];
+        return i + 1;
+    }
+
+    // Sort entries by last name using Timsort
+    sortEntriesByLastName() {
+        this.entries.sort((a, b) => a.lastName.localeCompare(b.lastName));
+        console.log("Entries sorted by last name using Timsort");
     }
 
     searchEntries(query, criteria = 'firstName') {
-        // Check if criteria is valid and the entry has this property
         const results = this.entries.filter(entry => {
             if (entry[criteria] && typeof entry[criteria] === 'string') {
                 return entry[criteria].includes(query);
@@ -58,7 +69,7 @@ class PhoneBook {
     }
 
     getEntriesGroupedByInitial() {
-        this.bubbleSortByLastName();
+        this.sortEntriesByLastName();  // Choose Timsort for sorting by last name
         const grouped = {};
         this.entries.forEach(entry => {
             const initial = entry.lastName[0].toUpperCase();

@@ -30,7 +30,7 @@ describe('PhoneBook Class', () => {
     it('should sort entries by last name', () => {
         phoneBook.addEntry('Charlie', 'Brown', '555-555-5555');
         phoneBook.addEntry('Alice', 'Smith', '123-456-7890');
-        phoneBook.bubbleSortByLastName();
+        phoneBook.sortEntriesByLastName();
         expect(phoneBook.entries[0].lastName).to.equal('Brown');
     });
 
