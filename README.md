@@ -1,8 +1,3 @@
-Certainly! Below is a comprehensive README file written in Markdown format for your `Phone Book Assignment`. This README will provide an overview of the project, installation instructions, usage guidelines, and details about the functionality implemented.
-
-### Full README.md
-
-```markdown
 # Phone Book Assignment
 
 ## Overview
@@ -11,12 +6,13 @@ This project implements a simple Phone Book application using JavaScript. The Ph
 
 ### Features
 
-- **Add New Entry**: Users can add a new contact with first name, last name, phone number, and email.
+- **Add New Entry**: Users can add a new contact with a first name, last name, phone number, and email.
 - **Update Entry**: Users can update an existing contact's details.
 - **Delete Entry**: Users can delete a contact from the phone book.
-- **Sort Entries**: Entries can be sorted by last name using the Quick Sort algorithm and Timsort (JavaScript's native sort).
-- **Search Entries**: Users can search for contacts by first name, last name, or phone number.
+- **Sort Entries**: Entries can be sorted by last name using JavaScript’s native sort, which utilizes Timsort.
+- **Search Entries**: Users can search for contacts by first name, last name, or phone number using efficient search techniques.
 - **Display Entries**: Entries are displayed grouped by the initial letter of the last name.
+- **Duplicate Detection**: The system detects and prevents the addition of duplicate entries.
 
 ## Technologies Used
 
@@ -75,7 +71,7 @@ This project implements a simple Phone Book application using JavaScript. The Ph
 
 3. **Open the HTML Interface**:
 
-    Open the `index.html` file in a web browser. Use the form to add new contacts, which will be displayed below the form.
+    Open the `index.html` file in a web browser. Use the form to add new contacts, which will be displayed below the form. You can also use the search functionality to find specific contacts.
 
 ### Running Tests
 
@@ -89,13 +85,12 @@ This command will run the Mocha test suite with Chai assertions to verify the fu
 
 ### PhoneBook Class Methods
 
-- `addEntry(firstName, lastName, phoneNumber, details)`: Adds a new entry to the phone book.
-- `updateEntry(firstName, lastName, newDetails)`: Updates an existing entry's details.
-- `deleteEntry(firstName, lastName)`: Deletes an entry from the phone book.
+- `addEntry(firstName, lastName, phoneNumber, details)`: Adds a new entry to the phone book. Returns `true` if the entry is added, or an alert message if a duplicate is detected.
+- `updateEntry(firstName, lastName, phoneNumber, newDetails)`: Updates an existing entry's details based on the composite key.
+- `deleteEntry(firstName, lastName, phoneNumber)`: Deletes an entry from the phone book using the composite key.
 - `sortEntriesByLastName()`: Sorts entries by last name using Timsort (native JavaScript sort).
-- `quickSortEntries(low, high)`: Sorts entries by last name using the Quick Sort algorithm.
-- `searchEntries(query, criteria)`: Searches for entries based on a query and criteria (e.g., first name, last name).
-- `getEntriesGroupedByInitial()`: Groups entries by the initial letter of the last name.
+- `searchEntry(query, criteria)`: Searches for entries based on a query and criteria (e.g., first name, last name). Returns an array of matching entries.
+- `getEntriesGroupedByInitial()`: Groups entries by the initial letter of the last name for display.
 
 ## File Structure
 
@@ -110,12 +105,10 @@ Phone Book Assignment/
 ├── index.js               # Main application file
 ├── index.html             # HTML interface for the phone book
 ├── script.js              # JavaScript for handling HTML interactions
+├── styles.css             # CSS file for styling the HTML interface
 └── README.md              # Project documentation (this file)
 ```
 
 ## License
 
 This project is licensed under the MIT License.
-
-
-

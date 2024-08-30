@@ -47,7 +47,7 @@ th {
 .initial-header {
     background-color: #f9f9f9;
     font-weight: bold;
-    text-align: left; /* Changed from center to left */
+    text-align: left; /* Align to the left */
     padding: 10px;
     border-top: 2px solid #ddd;
     border-bottom: 2px solid #ddd;

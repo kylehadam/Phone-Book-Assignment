@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phone Book</title>
-    <!-- Link to the external CSS file -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,6 +15,19 @@
         <input type="email" id="email" placeholder="Email">
         <button type="submit">Add Entry</button>
     </form>
+
+    <!-- Search form -->
+    <form id="searchForm">
+        <input type="text" id="searchQuery" placeholder="Search" required>
+        <select id="searchCriteria">
+            <option value="firstName">First Name</option>
+            <option value="lastName">Last Name</option>
+            <option value="phoneNumber">Phone Number</option>
+            <option value="email">Email</option>
+        </select>
+        <button type="submit">Search</button>
+    </form>
+
     <table>
         <thead>
             <tr>

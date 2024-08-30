@@ -2,62 +2,71 @@
 class PhoneBook {
     constructor() {
         this.entries = [];
+        this.entryMap = new Map(); // Hash map for quick lookup
     }
 
     addEntry(firstName, lastName, phoneNumber, details = {}) {
-        // Check for duplicate entries
-        const duplicate = this.entries.some(entry =>
-            entry.firstName === firstName &&
-            entry.lastName === lastName &&
-            entry.phoneNumber === phoneNumber &&
-            entry.email === details.email
-        );
-
-        if (duplicate) {
+        const key = `${firstName}-${lastName}-${phoneNumber}`.toLowerCase(); // Create a unique key
+        if (this.entryMap.has(key)) {
             alert(`An entry with the same details already exists for ${firstName} ${lastName}.`);
             return false; // Indicate that the entry was not added
         }
 
         const entry = { firstName, lastName, phoneNumber, ...details };
         this.entries.push(entry);
+        this.entryMap.set(key, entry); // Store in Map for quick access
         console.log(`Added entry: ${firstName} ${lastName}`);
         return true; // Indicate that the entry was added successfully
     }
 
-    updateEntry(firstName, lastName, newDetails) {
-        const index = this.entries.findIndex(entry => entry.firstName === firstName && entry.lastName === lastName);
-        if (index !== -1) {
-            this.entries[index] = { ...this.entries[index], ...newDetails };
-            console.log(`Updated entry for: ${firstName} ${lastName}`);
-        } else {
-            console.log(`Entry not found for: ${firstName} ${lastName}`);
-        }
-    }
-
-    deleteEntry(firstName, lastName) {
+    deleteEntry(firstName, lastName, phoneNumber) {
+        const key = `${firstName}-${lastName}-${phoneNumber}`.toLowerCase();
         const initialLength = this.entries.length;
-        this.entries = this.entries.filter(entry => !(entry.firstName === firstName && entry.lastName === lastName));
+
+        this.entries = this.entries.filter(entry => {
+            const entryKey = `${entry.firstName}-${entry.lastName}-${entry.phoneNumber}`.toLowerCase();
+            return entryKey !== key;
+        });
+
         if (this.entries.length < initialLength) {
+            this.entryMap.delete(key); // Remove from Map
             console.log(`Deleted entry for: ${firstName} ${lastName}`);
         } else {
             console.log(`Entry not found for: ${firstName} ${lastName}`);
         }
     }
 
+    updateEntry(firstName, lastName, phoneNumber, newDetails) {
+        const key = `${firstName}-${lastName}-${phoneNumber}`.toLowerCase();
+        if (this.entryMap.has(key)) {
+            const entry = this.entryMap.get(key);
+            Object.assign(entry, newDetails);
+            console.log(`Updated entry for: ${firstName} ${lastName}`);
+        } else {
+            console.log(`Entry not found for: ${firstName} ${lastName}`);
+        }
+    }
+
+    searchEntry(query, criteria = 'firstName') {
+        const results = [];
+        const queryLower = query.toLowerCase();
+        
+        for (let entry of this.entryMap.values()) {
+            if (entry[criteria].toLowerCase().includes(queryLower)) {
+                results.push(entry);
+            }
+        }
+
+        if (results.length === 0) {
+            alert('No entry found');
+        }
+        console.log(`Search results for ${query} by ${criteria}:`, results);
+        return results;
+    }
+
     sortEntriesByLastName() {
         this.entries.sort((a, b) => a.lastName.localeCompare(b.lastName));
         console.log("Entries sorted by last name using Timsort");
-    }
-
-    searchEntries(query, criteria = 'firstName') {
-        const results = this.entries.filter(entry => {
-            if (entry[criteria] && typeof entry[criteria] === 'string') {
-                return entry[criteria].includes(query);
-            }
-            return false;
-        });
-        console.log(`Search results for ${query} by ${criteria}:`, results);
-        return results;
     }
 
     getEntriesGroupedByInitial() {
@@ -95,6 +104,23 @@ document.addEventListener('DOMContentLoaded', function () {
             displayEntries(phoneBook.getEntriesGroupedByInitial());
             clearForm(); // Clear the form fields after adding an entry
         }
+    });
+
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const searchQueryElement = document.getElementById('searchQuery');
+        const searchCriteriaElement = document.getElementById('searchCriteria');
+
+        if (!searchQueryElement || !searchCriteriaElement) {
+            console.error("Search query or criteria element not found");
+            return;
+        }
+
+        const query = searchQueryElement.value;
+        const criteria = searchCriteriaElement.value;
+
+        const results = phoneBook.searchEntry(query, criteria); // Use hash map for search
+        displayEntriesByResults(results);
     });
 
     function formatPhoneNumber(phoneNumber) {
@@ -148,6 +174,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 entriesList.appendChild(row);
             });
+        });
+    }
+
+    function displayEntriesByResults(results) {
+        const entriesList = document.getElementById('entries');
+        entriesList.innerHTML = ''; // Clear existing entries
+
+        if (results.length === 0) {
+            alert('No entry found');
+            return;
+        }
+
+        results.forEach(entry => {
+            const row = document.createElement('tr');
+
+            const lastNameCell = document.createElement('td');
+            lastNameCell.textContent = entry.lastName;
+            row.appendChild(lastNameCell);
+
+            const firstNameCell = document.createElement('td');
+            firstNameCell.textContent = entry.firstName;
+            row.appendChild(firstNameCell);
+
+            const phoneNumberCell = document.createElement('td');
+            phoneNumberCell.textContent = entry.phoneNumber;
+            row.appendChild(phoneNumberCell);
+
+            const emailCell = document.createElement('td');
+            if (entry.email) {
+                const emailLink = document.createElement('a');
+                emailLink.href = `mailto:${entry.email}`;
+                emailLink.textContent = entry.email;
+                emailCell.appendChild(emailLink);
+            } else {
+                emailCell.textContent = 'No email';
+            }
+            row.appendChild(emailCell);
+
+            entriesList.appendChild(row);
         });
     }
 
