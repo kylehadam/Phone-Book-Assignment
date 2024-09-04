@@ -1,6 +1,6 @@
 const chai = require('chai');
 const { expect } = chai;
-const PhoneBook = require('../PhoneBook'); // Adjust the path as necessary
+const PhoneBook = require('../PhoneBook'); 
 
 describe('PhoneBook Class', () => {
     let phoneBook;
