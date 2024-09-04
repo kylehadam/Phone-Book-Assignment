@@ -87,6 +87,7 @@ class PhoneBook {
 document.addEventListener('DOMContentLoaded', function () {
     const phoneBook = new PhoneBook();
 
+    // Handle adding a new entry
     document.getElementById('phoneBookForm').addEventListener('submit', function(event) {
         event.preventDefault();
         const firstName = document.getElementById('firstName').value;
@@ -106,33 +107,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Handle search functionality
     document.getElementById('searchForm').addEventListener('submit', function(event) {
         event.preventDefault();
-        const searchQueryElement = document.getElementById('searchQuery');
-        const searchCriteriaElement = document.getElementById('searchCriteria');
+        const query = document.getElementById('searchQuery').value;
+        const criteria = document.getElementById('searchCriteria').value;
 
-        if (!searchQueryElement || !searchCriteriaElement) {
-            console.error("Search query or criteria element not found");
-            return;
-        }
-
-        const query = searchQueryElement.value;
-        const criteria = searchCriteriaElement.value;
-
-        const results = phoneBook.searchEntry(query, criteria); // Use hash map for search
+        const results = phoneBook.searchEntry(query, criteria); // Perform search
         displayEntriesByResults(results);
     });
 
-    function formatPhoneNumber(phoneNumber) {
-        // Format phone number to (XXX) XXX-XXXX
-        const cleaned = ('' + phoneNumber).replace(/\D/g, '');
-        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-        if (match) {
-            return `(${match[1]}) ${match[2]}-${match[3]}`;
-        }
-        return null;
-    }
+    // Handle showing all entries (Reset functionality)
+    document.getElementById('showAllButton').addEventListener('click', function() {
+        displayEntries(phoneBook.getEntriesGroupedByInitial()); // Show all stored entries
+    });
 
+    // Function to display entries grouped by initials
     function displayEntries(groupedEntries) {
         const entriesList = document.getElementById('entries');
         entriesList.innerHTML = ''; // Clear existing entries
@@ -177,6 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Function to display search results
     function displayEntriesByResults(results) {
         const entriesList = document.getElementById('entries');
         entriesList.innerHTML = ''; // Clear existing entries
@@ -216,11 +207,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Function to clear the form after adding an entry
     function clearForm() {
-        // Clear input fields
         document.getElementById('firstName').value = '';
         document.getElementById('lastName').value = '';
         document.getElementById('phoneNumber').value = '';
         document.getElementById('email').value = '';
+    }
+
+    // Helper function to format phone numbers
+    function formatPhoneNumber(phoneNumber) {
+        const cleaned = ('' + phoneNumber).replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+        if (match) {
+            return `(${match[1]}) ${match[2]}-${match[3]}`;
+        }
+        return null;
     }
 });
