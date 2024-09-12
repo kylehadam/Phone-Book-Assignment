@@ -9,23 +9,38 @@ body {
 h1 {
     color: #333;
     text-align: center;
+    margin-bottom: 20px;
 }
 
 /* Form */
 form {
     max-width: 500px;
     margin: 20px auto;
-    padding: 10px;
+    padding: 15px;
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
-form input, form button {
+form input, form button, form select {
     width: calc(100% - 20px);
-    margin: 5px;
-    padding: 10px;
+    margin: 10px 0;
+    padding: 12px;
     font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+form button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #0056b3;
 }
 
 /* Table */
@@ -34,17 +49,51 @@ table {
     margin: 20px auto;
     border-collapse: collapse;
     background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
-    padding: 12px;
+    padding: 15px;
     border: 1px solid #ddd;
     text-align: left;
+    font-size: 16px;
 }
 
 th {
     background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+td {
+    background-color: #f9f9f9;
+}
+
+/* Action buttons */
+button.update-btn, button.delete-btn {
+    padding: 8px 12px;
+    margin-right: 5px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+button.update-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+button.update-btn:hover {
+    background-color: #218838;
+}
+
+button.delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+button.delete-btn:hover {
+    background-color: #c82333;
 }
 
 /* Grouping header */
@@ -60,5 +109,45 @@ th {
 /* Links */
 a {
     text-decoration: none;
-    color: blue;
+    color: #007BFF;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Modal styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    border-radius: 8px;
+}
+
+#closeModal {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#closeModal:hover {
+    background-color: #c82333;
 }

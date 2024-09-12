@@ -18,6 +18,17 @@
         <button type="submit">Add Entry</button>
     </form>
 
+    <!-- Sort by criteria form -->
+    <form id="sortForm">
+        <select id="sortCriteria">
+            <option value="lastName">Sort by Last Name</option>
+            <option value="firstName">Sort by First Name</option>
+            <option value="phoneNumber">Sort by Phone Number</option>
+            <option value="email">Sort by Email</option>
+        </select>
+        <button type="submit">Sort Entries</button>
+    </form>
+
     <!-- Search form -->
     <form id="searchForm">
         <input type="text" id="searchQuery" placeholder="Search" required>
@@ -41,12 +52,28 @@
                 <th>First Name</th>
                 <th>Phone Number</th>
                 <th>Email</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody id="entries">
             <!-- Entries will be dynamically inserted here -->
         </tbody>
     </table>
+
+    <!-- Modal for updating entries -->
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Contact Information</h2>
+            <form id="updateForm">
+                <input type="text" id="updateFirstName" placeholder="First Name" required>
+                <input type="text" id="updateLastName" placeholder="Last Name" required>
+                <input type="text" id="updatePhoneNumber" placeholder="Phone Number" required>
+                <input type="email" id="updateEmail" placeholder="Email">
+                <button type="submit">Update Entry</button>
+            </form>
+            <button id="closeModal">Close</button>
+        </div>
+    </div>
 
     <!-- Link to the script file -->
     <script src="script.js"></script>

@@ -7,10 +7,10 @@ This project implements a simple **Phone Book** application using **JavaScript**
 ### Features
 
 - **Add New Entry**: Users can add a new contact with a first name, last name, phone number (in the format (XXX) XXX-XXXX), and email.
-- **Update Entry**: Users can update an existing contact's details.
+- **Update Entry**: Users can update an existing contact's details in one modal view.
 - **Delete Entry**: Users can delete a contact from the phone book.
-- **Sort Entries**: Entries can be sorted by last name using JavaScript’s native sort, which utilizes **Timsort**.
-- **Search Entries**: Users can search for contacts by first name, last name, or phone number using efficient search techniques.
+- **Sort Entries**: Entries can be sorted by last name, first name, phone number, or email using JavaScript’s native sort, which utilizes **Timsort**.
+- **Search Entries**: Users can search for contacts by first name, last name, phone number, or email using efficient search techniques.
 - **Display Entries**: Entries are displayed grouped by the initial letter of the last name for easy browsing.
 - **Duplicate Detection**: The system detects and prevents the addition of duplicate entries.
 - **Show All Entries**: After a search, users can reset the phone book to display all stored entries.
@@ -94,8 +94,8 @@ This command will run the **Mocha** test suite with **Chai** assertions to verif
 - `addEntry(firstName, lastName, phoneNumber, details)`: Adds a new entry to the phone book. Returns `true` if the entry is added, or an alert if a duplicate is detected.
 - `updateEntry(firstName, lastName, phoneNumber, newDetails)`: Updates an existing entry's details based on the composite key.
 - `deleteEntry(firstName, lastName, phoneNumber)`: Deletes an entry from the phone book using the composite key.
-- `sortEntriesByLastName()`: Sorts entries by last name using **Timsort** (JavaScript’s native sorting algorithm).
-- `searchEntry(query, criteria)`: Searches for entries based on a query and criteria (e.g., first name, last name, or phone number). Returns an array of matching entries.
+- `sortEntries(criteria)`: Sorts entries by a given criterion (last name, first name, phone number, or email) using **Timsort** (JavaScript’s native sorting algorithm).
+- `searchEntry(query, criteria)`: Searches for entries based on a query and criteria (e.g., first name, last name, phone number, or email). Returns an array of matching entries.
 - `getEntriesGroupedByInitial()`: Groups entries by the initial letter of the last name for display.
 
 ### Example Use
@@ -114,12 +114,12 @@ phoneBook.deleteEntry('John', 'Doe', '123-456-7890');
 const results = phoneBook.searchEntry('John', 'firstName');
 
 // Sort the phone book by last name
-phoneBook.sortEntriesByLastName();
+phoneBook.sortEntries('lastName');
 ```
 
 ## Displaying Descendants (Grouping & Searching)
 
-- **Search Example**: You can search for contacts by any criteria such as first name, last name, or phone number. For instance, searching for `Doe` will return all contacts with the last name `Doe`.
+- **Search Example**: You can search for contacts by any criteria such as first name, last name, phone number, or email. For instance, searching for `Doe` will return all contacts with the last name `Doe`.
   
 - **Grouping Example**: The entries are grouped and displayed by the first letter of the last name (e.g., all contacts with last names starting with "A" will be grouped under "A").
 
@@ -128,7 +128,7 @@ phoneBook.sortEntriesByLastName();
 phoneBook.addEntry('Alice', 'Anderson', '1234567890');
 phoneBook.addEntry('Bob', 'Brown', '0987654321');
 
-phoneBook.sortEntriesByLastName();
+phoneBook.sortEntries('lastName');
 phoneBook.getEntriesGroupedByInitial();
 // Output:
 // {

@@ -1,227 +1,208 @@
-// Define the PhoneBook class
 class PhoneBook {
     constructor() {
         this.entries = [];
-        this.entryMap = new Map(); // Hash map for quick lookup
+        this.entryMap = new Map();
+        this.idCounter = 0; // Unique ID counter for each entry
+    }
+
+    generateId() {
+        return ++this.idCounter;
     }
 
     addEntry(firstName, lastName, phoneNumber, details = {}) {
-        const key = `${firstName}-${lastName}-${phoneNumber}`.toLowerCase(); // Create a unique key
+        const id = this.generateId();
+        const key = `${firstName} ${lastName} ${phoneNumber}`;
         if (this.entryMap.has(key)) {
-            alert(`An entry with the same details already exists for ${firstName} ${lastName}.`);
-            return false; // Indicate that the entry was not added
+            console.log('Duplicate entry detected. Entry not added.');
+            return false;
         }
 
-        const entry = { firstName, lastName, phoneNumber, ...details };
+        const entry = { id, firstName, lastName, phoneNumber, ...details };
         this.entries.push(entry);
-        this.entryMap.set(key, entry); // Store in Map for quick access
+        this.entryMap.set(id, entry);
         console.log(`Added entry: ${firstName} ${lastName}`);
-        return true; // Indicate that the entry was added successfully
+        return true;
     }
 
-    deleteEntry(firstName, lastName, phoneNumber) {
-        const key = `${firstName}-${lastName}-${phoneNumber}`.toLowerCase();
-        const initialLength = this.entries.length;
-
-        this.entries = this.entries.filter(entry => {
-            const entryKey = `${entry.firstName}-${entry.lastName}-${entry.phoneNumber}`.toLowerCase();
-            return entryKey !== key;
-        });
-
-        if (this.entries.length < initialLength) {
-            this.entryMap.delete(key); // Remove from Map
-            console.log(`Deleted entry for: ${firstName} ${lastName}`);
-        } else {
-            console.log(`Entry not found for: ${firstName} ${lastName}`);
+    updateEntry(id, newDetails) {
+        if (!this.entryMap.has(id)) {
+            console.log(`Entry not found with ID: ${id}`);
+            return false;
         }
+
+        const updatedEntry = { ...this.entryMap.get(id), ...newDetails };
+        const index = this.entries.findIndex(entry => entry.id === id);
+        if (index !== -1) {
+            this.entries[index] = updatedEntry;
+            this.entryMap.set(id, updatedEntry);
+            console.log(`Updated entry for ID: ${id}`);
+            return true;
+        }
+        return false;
     }
 
-    updateEntry(firstName, lastName, phoneNumber, newDetails) {
-        const key = `${firstName}-${lastName}-${phoneNumber}`.toLowerCase();
-        if (this.entryMap.has(key)) {
-            const entry = this.entryMap.get(key);
-            Object.assign(entry, newDetails);
-            console.log(`Updated entry for: ${firstName} ${lastName}`);
-        } else {
-            console.log(`Entry not found for: ${firstName} ${lastName}`);
+    deleteEntry(id) {
+        if (!this.entryMap.has(id)) {
+            console.log(`Entry not found with ID: ${id}`);
+            return false;
         }
+
+        this.entries = this.entries.filter(entry => entry.id !== id);
+        this.entryMap.delete(id);
+        console.log(`Deleted entry with ID: ${id}`);
+        return true;
     }
 
-    searchEntry(query, criteria = 'firstName') {
-        const results = [];
-        const queryLower = query.toLowerCase();
-        
-        for (let entry of this.entryMap.values()) {
-            if (entry[criteria].toLowerCase().includes(queryLower)) {
-                results.push(entry);
-            }
-        }
-
-        if (results.length === 0) {
-            alert('No entry found');
-        }
+    searchEntries(query, criteria = 'firstName') {
+        const results = this.entries.filter(entry => entry[criteria].toLowerCase().includes(query.toLowerCase()));
         console.log(`Search results for ${query} by ${criteria}:`, results);
         return results;
     }
 
-    sortEntriesByLastName() {
-        this.entries.sort((a, b) => a.lastName.localeCompare(b.lastName));
-        console.log("Entries sorted by last name using Timsort");
+    // Extend sorting function in PhoneBook class to handle different criteria
+    sortEntries(criteria) {
+        this.entries.sort((a, b) => a[criteria].localeCompare(b[criteria]));
+        console.log(`Entries sorted by ${criteria} using Timsort`);
     }
 
     getEntriesGroupedByInitial() {
-        this.sortEntriesByLastName();  // Sort entries by last name
-        const grouped = {};
-        this.entries.forEach(entry => {
-            const initial = entry.lastName[0].toUpperCase();
-            if (!grouped[initial]) {
-                grouped[initial] = [];
+        return this.entries.reduce((groups, entry) => {
+            const initial = entry.lastName.charAt(0).toUpperCase();
+            if (!groups[initial]) {
+                groups[initial] = [];
             }
-            grouped[initial].push(entry);
-        });
-        return grouped;
+            groups[initial].push(entry);
+            return groups;
+        }, {});
     }
 }
 
-// Document ready function
 document.addEventListener('DOMContentLoaded', function () {
     const phoneBook = new PhoneBook();
+    let currentEntryId = null; // Store the ID of the entry being edited
 
-    // Handle adding a new entry
+    // Modal logic
+    const modal = document.getElementById('updateModal');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    closeModalBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+
+    // Handle add entry form submission
     document.getElementById('phoneBookForm').addEventListener('submit', function(event) {
         event.preventDefault();
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
-        const phoneNumber = formatPhoneNumber(document.getElementById('phoneNumber').value);
+        const phoneNumber = document.getElementById('phoneNumber').value;
         const email = document.getElementById('email').value;
 
-        if (!phoneNumber) {
-            alert("Please enter a valid phone number in the format: 1234567890");
-            return;
-        }
-
-        const isAdded = phoneBook.addEntry(firstName, lastName, phoneNumber, { email });
-        if (isAdded) {
-            displayEntries(phoneBook.getEntriesGroupedByInitial());
-            clearForm(); // Clear the form fields after adding an entry
-        }
+        phoneBook.addEntry(firstName, lastName, phoneNumber, { email });
+        document.getElementById('phoneBookForm').reset();
+        displayEntries(phoneBook.getEntriesGroupedByInitial());
     });
 
-    // Handle search functionality
+    // Handle sort form submission
+    document.getElementById('sortForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const criteria = document.getElementById('sortCriteria').value;
+        phoneBook.sortEntries(criteria);
+        displayEntries(phoneBook.getEntriesGroupedByInitial());
+    });
+
+    // Handle search form submission
     document.getElementById('searchForm').addEventListener('submit', function(event) {
         event.preventDefault();
         const query = document.getElementById('searchQuery').value;
         const criteria = document.getElementById('searchCriteria').value;
-
-        const results = phoneBook.searchEntry(query, criteria); // Perform search
-        displayEntriesByResults(results);
+        const results = phoneBook.searchEntries(query, criteria);
+        displayEntries({ SearchResults: results });
     });
 
-    // Handle showing all entries (Reset functionality)
+    // Handle "Show All" button click
     document.getElementById('showAllButton').addEventListener('click', function() {
-        displayEntries(phoneBook.getEntriesGroupedByInitial()); // Show all stored entries
+        displayEntries(phoneBook.getEntriesGroupedByInitial());
     });
 
-    // Function to display entries grouped by initials
+    // Display entries in the table grouped by initials
     function displayEntries(groupedEntries) {
-        const entriesList = document.getElementById('entries');
-        entriesList.innerHTML = ''; // Clear existing entries
+        const tbody = document.getElementById('entries');
+        tbody.innerHTML = ''; // Clear previous entries
 
         Object.keys(groupedEntries).forEach(initial => {
-            const initialHeader = document.createElement('tr');
+            // Add header for each initial
+            const headerRow = document.createElement('tr');
             const headerCell = document.createElement('td');
-            headerCell.colSpan = 4;
+            headerCell.setAttribute('colspan', '5');
             headerCell.className = 'initial-header';
             headerCell.textContent = initial;
-            initialHeader.appendChild(headerCell);
-            entriesList.appendChild(initialHeader);
+            headerRow.appendChild(headerCell);
+            tbody.appendChild(headerRow);
 
             groupedEntries[initial].forEach(entry => {
                 const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.lastName}</td>
+                    <td>${entry.firstName}</td>
+                    <td>${formatPhoneNumber(entry.phoneNumber)}</td>
+                    <td><a href="mailto:${entry.email}">${entry.email || 'No email'}</a></td>
+                    <td>
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </td>
+                `;
 
-                const lastNameCell = document.createElement('td');
-                lastNameCell.textContent = entry.lastName;
-                row.appendChild(lastNameCell);
+                // Add event listeners for update and delete buttons
+                row.querySelector('.update-btn').addEventListener('click', () => {
+                    // Set current entry ID and pre-fill modal form fields
+                    currentEntryId = entry.id;
+                    document.getElementById('updateFirstName').value = entry.firstName;
+                    document.getElementById('updateLastName').value = entry.lastName;
+                    document.getElementById('updatePhoneNumber').value = entry.phoneNumber;
+                    document.getElementById('updateEmail').value = entry.email;
 
-                const firstNameCell = document.createElement('td');
-                firstNameCell.textContent = entry.firstName;
-                row.appendChild(firstNameCell);
+                    modal.style.display = 'block'; // Show the modal
+                });
 
-                const phoneNumberCell = document.createElement('td');
-                phoneNumberCell.textContent = entry.phoneNumber;
-                row.appendChild(phoneNumberCell);
+                row.querySelector('.delete-btn').addEventListener('click', () => {
+                    phoneBook.deleteEntry(entry.id);
+                    displayEntries(phoneBook.getEntriesGroupedByInitial());
+                });
 
-                const emailCell = document.createElement('td');
-                if (entry.email) {
-                    const emailLink = document.createElement('a');
-                    emailLink.href = `mailto:${entry.email}`;
-                    emailLink.textContent = entry.email;
-                    emailCell.appendChild(emailLink);
-                } else {
-                    emailCell.textContent = 'No email';
-                }
-                row.appendChild(emailCell);
-
-                entriesList.appendChild(row);
+                tbody.appendChild(row);
             });
         });
     }
 
-    // Function to display search results
-    function displayEntriesByResults(results) {
-        const entriesList = document.getElementById('entries');
-        entriesList.innerHTML = ''; // Clear existing entries
+    // Handle update form submission in the modal
+    document.getElementById('updateForm').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-        if (results.length === 0) {
-            alert('No entry found');
-            return;
-        }
+        const updatedFirstName = document.getElementById('updateFirstName').value;
+        const updatedLastName = document.getElementById('updateLastName').value;
+        const updatedPhoneNumber = document.getElementById('updatePhoneNumber').value;
+        const updatedEmail = document.getElementById('updateEmail').value;
 
-        results.forEach(entry => {
-            const row = document.createElement('tr');
-
-            const lastNameCell = document.createElement('td');
-            lastNameCell.textContent = entry.lastName;
-            row.appendChild(lastNameCell);
-
-            const firstNameCell = document.createElement('td');
-            firstNameCell.textContent = entry.firstName;
-            row.appendChild(firstNameCell);
-
-            const phoneNumberCell = document.createElement('td');
-            phoneNumberCell.textContent = entry.phoneNumber;
-            row.appendChild(phoneNumberCell);
-
-            const emailCell = document.createElement('td');
-            if (entry.email) {
-                const emailLink = document.createElement('a');
-                emailLink.href = `mailto:${entry.email}`;
-                emailLink.textContent = entry.email;
-                emailCell.appendChild(emailLink);
-            } else {
-                emailCell.textContent = 'No email';
-            }
-            row.appendChild(emailCell);
-
-            entriesList.appendChild(row);
+        phoneBook.updateEntry(currentEntryId, {
+            firstName: updatedFirstName,
+            lastName: updatedLastName,
+            phoneNumber: updatedPhoneNumber,
+            email: updatedEmail
         });
-    }
 
-    // Function to clear the form after adding an entry
-    function clearForm() {
-        document.getElementById('firstName').value = '';
-        document.getElementById('lastName').value = '';
-        document.getElementById('phoneNumber').value = '';
-        document.getElementById('email').value = '';
-    }
+        modal.style.display = 'none'; // Hide the modal
+        displayEntries(phoneBook.getEntriesGroupedByInitial());
+    });
 
-    // Helper function to format phone numbers
     function formatPhoneNumber(phoneNumber) {
-        const cleaned = ('' + phoneNumber).replace(/\D/g, '');
-        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-        if (match) {
-            return `(${match[1]}) ${match[2]}-${match[3]}`;
-        }
-        return null;
+        return phoneNumber.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
     }
+
+    displayEntries(phoneBook.getEntriesGroupedByInitial()); // Initial display
 });
